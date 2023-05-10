@@ -10,3 +10,11 @@ walkdir = "2.3.2"
 indicatif = "0.16.2"
 rayon = "1.5.1"
 is_executable = "0.1.2"
+
+[build-dependencies]
+winres = "0.1"
+
+[package.metadata]
+# ...
+[package.metadata.cargo-windows]
+manifest-file = "elevate.manifest"
