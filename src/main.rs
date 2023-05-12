@@ -1,10 +1,11 @@
 use indicatif::{ProgressBar, ProgressStyle};
-use rayon::prelude::*;
 use std::borrow::Cow;
+use std::env;
 use std::sync::{atomic::{AtomicUsize, Ordering}, Arc};
 use std::process::{Command, ExitStatus, Stdio};
 use walkdir::{DirEntry, WalkDir};
-use std::io::Write;
+use std::io::{Write};
+use std::fs::File;
 
 #[cfg(unix)]
 use std::os::unix::process::ExitStatusExt;
@@ -13,10 +14,9 @@ use std::os::unix::process::ExitStatusExt;
 use std::os::windows::process::ExitStatusExt;
 
 fn main() {
-    println!("==========================================");
-    println!("=============== AQ Drivers ===============");
-    println!("==========================================");
-    println!("\nWarning: Do not turn off your computer during the installation process.\n");
+    let args: Vec<String> = env::args().collect();
+
+    let logging_enabled = args.len() > 1 && args[1] == "log";
 
     let driver_list: Vec<DirEntry> = WalkDir::new(".")
         .into_iter()
@@ -36,20 +36,32 @@ fn main() {
     let successful_installs = Arc::new(AtomicUsize::new(0));
     let failed_installs = Arc::new(AtomicUsize::new(0));
 
-    driver_list.into_par_iter().for_each(|entry| {
+    let log_file = if logging_enabled {
+        Some(File::create("log.txt").unwrap())
+    } else {
+        None
+    };
+
+    driver_list.into_iter().for_each(|entry| {
         let path = entry.path();
         let driver_name = path.file_name().unwrap().to_string_lossy();
-        let message = format!("Устанавливаем драйвер: {}", driver_name);
-        pb.set_message(Cow::Owned(message));
+        let message = format!("Installing driver: {}", driver_name);
+        pb.set_message(Cow::Owned(message.clone()));
 
-        let status = Command::new("pnputil.exe")
-            .arg("/add-driver")
+        let mut command = Command::new("pnputil.exe");
+        command.arg("/add-driver")
             .arg(path.as_os_str())
-            .arg("/install")
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .unwrap_or_else(|_| ExitStatus::from_raw(1));
+            .arg("/install");
+
+        if let Some(log_file) = &log_file {
+            command.stdout(Stdio::from(log_file.try_clone().unwrap()))
+                   .stderr(Stdio::from(log_file.try_clone().unwrap()));
+        } else {
+            command.stdout(Stdio::null())
+                   .stderr(Stdio::null());
+        }
+
+        let status = command.status().unwrap_or_else(|_| ExitStatus::from_raw(1));
 
         if status.success() {
             successful_installs.fetch_add(1, Ordering::SeqCst);
@@ -63,11 +75,11 @@ fn main() {
         pb.inc(1);
     });
 
-    pb.finish_with_message("Завершено");
+    pb.finish_with_message("Done");
 
     println!(
-        "Успешных установок: {}, Неудачных установок: {}",
+        "Successful installs: {}, Failed installs: {}",
         successful_installs.load(Ordering::SeqCst),
-        failed_installs.load(Ordering::SeqCst)
+        failed_installs.load(Ordering::SeqCst),
     );
 }
