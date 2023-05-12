@@ -38,3 +38,7 @@ driver_v2.exe
 .gitignore
 .vscode/launch.json
 START.bat
+.vscode/launch.json
+driver_v2.exe
+inf.inf
+START.bat
