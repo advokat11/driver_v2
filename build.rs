@@ -15,7 +15,7 @@ fn main() -> io::Result<()> {
         
         let out_dir = env::var("OUT_DIR").unwrap();
 
-        let exe_path = format!("C:\\Users\\user\\Desktop\\Code\\driver_v2\\target\\debug\\driver_v2");
+        let exe_path = format!("C:\\Users\\user\\Desktop\\Code\\driver_v2\\target\\release\\driver_v2");
 
         let status = Command::new("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\\x64\\mt.exe")
             .arg("-manifest")

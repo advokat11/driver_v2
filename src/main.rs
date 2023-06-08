@@ -19,10 +19,10 @@ fn main() {
     let logging_enabled = args.len() > 1 && args[1] == "log";
 
     let driver_list: Vec<DirEntry> = WalkDir::new(".")
-        .into_iter()
-        .filter_map(Result::ok)
-        .filter(|e| e.file_name().to_string_lossy().ends_with(".inf"))
-        .collect();
+    .into_iter()
+    .filter_map(Result::ok)
+    .filter(|e| e.file_name().to_string_lossy().to_lowercase().ends_with(".inf"))
+    .collect();
 
     let num_drivers = driver_list.len() as u64;
 
