@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 walkdir = "2.3.2"
-indicatif = "0.16.2"
+pbr = "1.0.3"
 rayon = "1.5.1"
 is_executable = "0.1.2"
 term_size = "0.3.2"
