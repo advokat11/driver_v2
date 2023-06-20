@@ -38,7 +38,7 @@ fn main() {
     for entry in driver_list.into_iter() {
         let path = entry.path();
         let driver_name = path.file_name().unwrap().to_string_lossy();
-        let message = format!("Installing driver: {} ", driver_name);
+        let message = format!(" Installing driver: {} ", driver_name);
         pb.message(&message);
 
         let mut command = Command::new("pnputil.exe");
