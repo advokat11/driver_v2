@@ -32,18 +32,12 @@ fn main() {
         .collect();
 
     let num_drivers = driver_list.len() as u64;
-<<<<<<< HEAD
     let pb = ProgressBar::new(num_drivers);
     pb.set_style(
         ProgressStyle::default_bar()
             .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} {msg}")
             .progress_chars("=> "),
     );
-=======
-
-    let mut pb = ProgressBar::new(num_drivers);
-
->>>>>>> e375c2b52b333f90ca1d78f39ff765be840a1a0e
     let successful_installs = Arc::new(AtomicUsize::new(0));
     let failed_installs = Arc::new(AtomicUsize::new(0));
 
@@ -57,11 +51,7 @@ fn main() {
         let path = entry.path();
         let driver_name = path.file_name().unwrap().to_string_lossy();
         let message = format!(" Installing driver: {} ", driver_name);
-<<<<<<< HEAD
         pb.set_message(&message);
-=======
-        pb.message(&message);
->>>>>>> e375c2b52b333f90ca1d78f39ff765be840a1a0e
 
         let mut command = Command::new("pnputil.exe");
         command
@@ -84,18 +74,10 @@ fn main() {
         } else {
             failed_installs.fetch_add(1, Ordering::SeqCst);
         }
-<<<<<<< HEAD
         pb.inc(1);
     }
     println!();
     pb.finish_with_message("Done");
-=======
-
-        pb.inc();
-    }
-
-    pb.finish_print("Done");
->>>>>>> e375c2b52b333f90ca1d78f39ff765be840a1a0e
 
     println!(
         " Successful installs: {}, Failed installs: {}",
